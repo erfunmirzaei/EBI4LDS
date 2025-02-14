@@ -1,5 +1,6 @@
 # Reproducing Results: An Empirical Bernstein Inequality for Dependent Data in Hilbert Spaces and Applications
-This repository contains the code necessary to reproduce the results presented in the paper "An Empirical Bernstein Inequality for Dependent Data in Hilbert Spaces and Applications". The paper introduces a novel empirical Bernstein inequality for dependent data in Hilbert spaces and demonstrates its applications in various scenarios.
+This is the official repo for the experiments in the paper "An Empirical Bernstein Inequality for Dependent Data in Hilbert Spaces and Applications". The paper introduces a novel empirical Bernstein inequality for dependent data in Hilbert spaces and demonstrates its applications in various scenarios.
+
 
 ## Table of Contents:
 
