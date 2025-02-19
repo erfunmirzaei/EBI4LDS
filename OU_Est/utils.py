@@ -7,6 +7,13 @@ import matplotlib.lines as mlines
 main_path = Path(__file__).parent
 
 def prime_factors(n):
+    """
+    Return the prime factors of n
+    Args:  
+        n: int, number to factorize
+    Returns:
+        generator, prime factors of n
+    """
     i = 2
     while i * i <= n:
         if n % i == 0:
@@ -18,8 +25,14 @@ def prime_factors(n):
     if n > 1:
         yield n
 
-
 def prod(iterable):
+    """ 
+    Return the product of the elements in the iterable 
+    Args:
+        iterable: list, list of elements
+    Returns:
+        int, product of the elements in the iterable
+    """
     result = 1
     for i in iterable:
         result *= i
@@ -27,6 +40,13 @@ def prod(iterable):
 
 
 def get_divisors(n):
+    """
+    Return the divisors of n 
+    Args:
+        n: int, number to factorize
+    Returns:
+        generator, divisors of n
+    """
     pf = prime_factors(n)
 
     pf_with_multiplicity = collections.Counter(pf)
@@ -40,6 +60,25 @@ def get_divisors(n):
         yield prod(prime_power_combo)
 
 def plot_OU_tau_length_scale(ax, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_emp_bound_unbiased_cov_est, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est, taus, length_scale, show_ylabel=False):
+    """
+    Plot the bounds with respect to taus for a given length scale 
+    Args:
+        ax: object, axis object
+        Pinelis_bound: np.array, shape (n_0, n_repits), Pinelis bound for the covariance estimation
+        Pinelis_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with biased covariance estimation
+        Pinelis_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with unbiased covariance estimation
+        M_bound: np.array, shape (n_0, n_repits), our bound for the covariance estimation
+        M_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with biased covariance estimation
+        M_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with unbiased covariance estimation
+        taus: np.array, shape (n_0,), block sizes
+        length_scale: float, length scale of the OU process
+        show_ylabel: bool, whether to show the y-axis label
+    Returns:
+        line1: object, line object for the Pinelis bound
+        line4: object, line object for the our bound
+        line5: object, line object for the M empirical bound with biased covariance estimation
+        line6: object, line object for the M empirical bound with unbiased covariance estimation
+    """
     Pinelis_bound_mean = np.mean(Pinelis_bound, axis=-1)
     Pinelis_bound_std = np.std(Pinelis_bound, axis=-1)
     # Pinelis_emp_bound_biased_cov_est_mean = np.mean(Pinelis_emp_bound_biased_cov_est, axis=-1)
@@ -69,7 +108,7 @@ def plot_OU_tau_length_scale(ax, Pinelis_bound, Pinelis_emp_bound_biased_cov_est
     #                 Pinelis_emp_bound_unbiased_cov_est_mean + Pinelis_emp_bound_unbiased_cov_est_std, alpha=0.2)
     
     
-    line4 = ax.loglog(taus, M_bound_mean, marker='^', label="M bound", linewidth=1)
+    line4 = ax.loglog(taus, M_bound_mean, marker='^', label="our bound", linewidth=1)
     ax.fill_between(taus, M_bound_mean - M_bound_std,
                     M_bound_mean + M_bound_std, alpha=0.2)
         
@@ -91,6 +130,22 @@ def plot_OU_tau_length_scale(ax, Pinelis_bound, Pinelis_emp_bound_biased_cov_est
     return line1, line4, line5, line6
 
 def plot_OU_tau(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_emp_bound_unbiased_cov_est, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est, taus, length_scales, labels):
+    """
+    Plot the bounds with respect to taus for three different length scale at a fixed sample size
+    Args:
+        configs: object, configurations for the experiment
+        Pinelis_bound: np.array, shape (n_0, n_repits), Pinelis bound for the covariance estimation
+        Pinelis_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with biased covariance estimation
+        Pinelis_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with unbiased covariance estimation
+        M_bound: np.array, shape (n_0, n_repits), our bound for the covariance estimation
+        M_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with biased covariance estimation
+        M_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with unbiased covariance estimation
+        taus: np.array, shape (n_0,), block sizes
+        length_scales: list, list of length scales
+        labels: list, list of labels for the legend
+    Returns:
+        None, saves the plot as a pdf file
+    """
     # Create a figure with 3 subplots in a row, single-column width (3.25 inches)
     fig, axes = plt.subplots(1, len(length_scales), figsize=(3.25 * 3, 4.5))  # Adjust height as needed for visibility
 
@@ -116,14 +171,32 @@ def plot_OU_tau(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pineli
 
     # Pass the proxy Line2D objects to the legend
     fig.legend(legend_lines, labels, loc='upper center', fontsize=10, ncol=len(length_scales), frameon=False)
-    # fig.legend(lines[:n_labels], labels, loc='upper center', fontsize=10, ncol=n_labels, frameon=False)
 
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 1, 0.85])
     plt.subplots_adjust(top=0.85)  # Add more space between title and legend
     plt.savefig(str(main_path) + f"/results/OU_Exp_tau_n_{configs.n_plot_tau}_delta_{configs.delta}.pdf", format="pdf", dpi=600)
 
-def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est,True_value, Ns, length_scale, show_ylabel=False):
+def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est,True_value, Ns, show_ylabel=False):
+    """ Plot the bounds with respect to number of samples for a given length scale for optimal choice of tau 
+    Args:
+        ax: object, axis object
+        Pinelis_bound: np.array, shape (n_0, n_repits), Pinelis bound for the covariance estimation
+        Pinelis_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with biased covariance estimation
+        Pinelis_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with unbiased covariance estimation
+        M_bound: np.array, shape (n_0, n_repits), our bound for the covariance estimation
+        M_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with biased covariance estimation
+        M_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with unbiased covariance estimation
+        True_value: np.array, shape (n_0, n_repits), estimated true value of the covariance
+        Ns: np.array, shape (n_0,), number of samples
+        show_ylabel: bool, whether to show the y-axis label
+    Returns:
+        line1: object, line object for the Pinelis bound
+        line4: object, line object for the our bound
+        line5: object, line object for the M empirical bound with biased covariance estimation
+        line6: object, line object for the M empirical bound with unbiased covariance estimation
+        line7: object, line object for the estimated true value
+    """
     Pinelis_bound_mean = np.mean(Pinelis_bound, axis=-1)
     Pinelis_bound_std = np.std(Pinelis_bound, axis=-1)
     # Pinelis_emp_bound_biased_cov_est_mean = np.mean(Pinelis_emp_bound_biased_cov_est, axis=-1)
@@ -173,22 +246,36 @@ def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_es
     ax.set_xlabel("Number of training samples", fontsize=10)
     if show_ylabel:
         ax.set_ylabel("Covariance upper bound", fontsize=10)
-    ax.set_title(f"length scale ={length_scale}", fontsize=10)
+    # ax.set_title(f"length scale ={length_scale}", fontsize=10)
     ax.tick_params(axis='both', which='major', labelsize=10)
     ax.grid(True)
 
     return line1, line4, line5, line6, line7
 
 def plot_OU_N(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_emp_bound_unbiased_cov_est, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est,True_value, Ns, length_scales, labels, show_ylabel=False):
-
+    """ Plot the bounds with respect to number of samples for three different length scales at a fixed block size (optimal choice of tau) 
+    Args:
+        configs: object, configurations for the experiment
+        Pinelis_bound: np.array, shape (n_0, n_repits), Pinelis bound for the covariance estimation
+        Pinelis_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with biased covariance estimation
+        Pinelis_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), Pinelis empirical bound for the covariance estimation with unbiased covariance estimation
+        M_bound: np.array, shape (n_0, n_repits), our bound for the covariance estimation
+        M_emp_bound_biased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with biased covariance estimation
+        M_emp_bound_unbiased_cov_est: np.array, shape (n_0, n_repits), M empirical bound for the covariance estimation with unbiased covariance estimation
+        True_value: np.array, shape (n_0, n_repits), estimated true value of the covariance
+        Ns: np.array, shape (n_0,), number of samples
+        length_scales: list, list of length scales
+        labels: list, list of labels for the legend
+        show_ylabel: bool, whether to show the y-axis label
+    Returns:
+        None, saves the plot as a pdf file
+    """
     # Create a figure with 3 subplots in a row, single-column width (3.25 inches)
     fig, axes = plt.subplots(1, len(length_scales), figsize=(3.25 * 3, 4.5))  # Adjust height as needed for visibility
 
     # Plot each subplot and collect lines for the legend
     lines = []
-    for i, length_scale in enumerate(length_scales):
-        show_ylabel = (i == 0)  # Only show y-axis label on the first subplot
-        lines += plot_OU_N_length_scale(axes[i], Pinelis_bound[i], M_bound[i], M_emp_bound_biased_cov_est[i], M_emp_bound_unbiased_cov_est[i],True_value[i], Ns, length_scale, show_ylabel=show_ylabel)
+    lines += plot_OU_N_length_scale(axes, Pinelis_bound[0], M_bound[0], M_emp_bound_biased_cov_est[0], M_emp_bound_unbiased_cov_est[0],True_value[0], Ns, show_ylabel=show_ylabel)
 
     # Create a common legend
     n_labels = len(labels)
@@ -207,7 +294,6 @@ def plot_OU_N(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_
 
     # Pass the proxy Line2D objects to the legend
     fig.legend(legend_lines, labels, loc='upper center', fontsize=10, ncol=len(length_scales), frameon=False)
-    # fig.legend(lines[:n_labels], labels, loc='upper center', fontsize=10, ncol=n_labels, frameon=False)
 
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 1, 0.85])
