@@ -2,6 +2,13 @@ import torch
 import numpy as np
 
 def make_block_matrices(matrix, tau):
+    """ Reshape a matrix into block matrices of size tau x tau.
+    Args:
+        matrix: numpy array of shape (n, n)
+        tau: block size
+    Returns:
+        block_matrix_result: numpy array of shape (n_blocks, n_blocks, tau, tau)
+    """
     n = matrix.shape[0]
     assert n % tau == 0, "Matrix dimensions must be divisible by tau"
 
@@ -12,6 +19,13 @@ def make_block_matrices(matrix, tau):
     return block_matrix_result
 
 def normalized_biased_covariance_estimator(cov_mtx, tau, c_h, b_h):
+    """Estimates the covariance from the squared kernel matrix using the biased estimator in the paper
+    Args:
+        cov_mtx: numpy array of shape (n, n)
+        tau: block size
+    Returns:
+        sum: sum of the terms in biased estimator normalized 
+    """
     n = cov_mtx.shape[0]
     block_cov_matrix = make_block_matrices(cov_mtx,tau)
     block_cov_matrix = (block_cov_matrix - b_h) / (c_h - b_h) # Normalize the block covariance matrix
@@ -19,6 +33,13 @@ def normalized_biased_covariance_estimator(cov_mtx, tau, c_h, b_h):
     return torch.sum(torch.pow(diag_blocks,2))/(n*tau)
 
 def normalized_unbiased_covariance_estimator(cov_mtx, tau, c_h, b_h):
+    """Estimates the covariance from the squared kernel matrix using the unbiased estimator in the paper
+    Args:
+        cov_mtx: numpy array of shape (n, n)
+        tau: block size
+    Returns:
+        sum: sum of the terms in unbiased estimator normalized
+    """
     n = cov_mtx.shape[0]
     m = n / (2*tau)
     block_cov_matrix = make_block_matrices(cov_mtx,tau)

@@ -16,6 +16,7 @@ from sklearn.model_selection import  ParameterGrid
 from tqdm import tqdm
 
 def evaluate_model(model: BaseModel, test_data, configs, oracle: ClassifierFeatureMap, test_labels: np.ndarray):
+    """ Evaluate the models accuracy of forecast based on the test data """
     assert model.is_fitted
     report = {
         'accuracy': [],
@@ -52,10 +53,7 @@ def evaluate_model(model: BaseModel, test_data, configs, oracle: ClassifierFeatu
 
 
 def fit_transfer_operator_models(train_dataset , oracle: ClassifierFeatureMap, val_data:np.ndarray ,test_data: np.ndarray, test_labels: np.ndarray, configs, device: torch.device):
-    """
-    Fit the transfer operator models
-
-    """
+    """ Fit the transfer operator models """
     train_data = traj_to_contexts(train_dataset['image'], backend='numpy')
     n = train_dataset.shape[0]  
     # We will now fit the transfer operator models. We will use the following models:
@@ -71,7 +69,7 @@ def fit_transfer_operator_models(train_dataset , oracle: ClassifierFeatureMap, v
 
     # - Nonlinear(CNN encoder) reduced-rank regression model
 
-    CNN_RRR_tikhonov_reg = 1e-7 #TODO: Change it back to without regularization
+    CNN_RRR_tikhonov_reg = 1e-7 # Tikhonov regularization parameter
     
     classifier_model = Nonlinear(oracle, reduced_rank= configs.reduced_rank, rank=configs.classes, tikhonov_reg= CNN_RRR_tikhonov_reg).fit(train_data)
     transfer_operator_models['Classifier_Baseline'] = classifier_model
@@ -96,10 +94,6 @@ def fit_transfer_operator_models(train_dataset , oracle: ClassifierFeatureMap, v
             'loss_fn': DPLoss,
             'loss_kwargs': {'relaxed': configs.dpnet_relaxed, 'metric_deformation': configs.dpnet_metric_deformation, 'center_covariances': configs.dpnet_center_covariances}
         },
-        # 'VAMPNets': {
-        #     'loss_fn': VAMPLoss,
-        #     'loss_kwargs': {'schatten_norm': 2, 'center_covariances': False}
-        # },
     }
 
     for fname, fdict in feature_maps.items():
@@ -128,54 +122,30 @@ def fit_transfer_operator_models(train_dataset , oracle: ClassifierFeatureMap, v
             report[model_name] = evaluate_model(model, test_data, configs, oracle, test_labels)
     
     C_H = {'Gaussian_RRR':0.0,
-        #    'Linear':0.0,
            'Classifier_Baseline':0.0,
            'DPNets':0.0}
 
     B_H = {'Gaussian_RRR':0.0,
-        #    'Linear':0.0,
            'Classifier_Baseline':0.0,
            'DPNets':0.0}
+    
     # Kernel matrices
     kernel_matrices = {}
+
     fm_linear = train_dataset['image'].numpy().reshape(n, -1)
-    # print(fm_linear.shape)
     kernel_matrices['Gaussian_RRR'] = kernel_model._kernel(fm_linear, fm_linear)
     C_H['Gaussian_RRR'] = np.max(kernel_matrices['Gaussian_RRR'])
-    # if  max > C_H['Gaussian_RRR']:
-    #     C_H['Gaussian_RRR'] = max
-
     B_H['Gaussian_RRR'] = np.min(kernel_matrices['Gaussian_RRR'])
-    # if  min < B_H['Gaussian_RRR']:
-    #     B_H['Gaussian_RRR'] = min
 
-    # print(kernel_matrices['Gaussian_RRR'].shape)
     fm_dpnet = feature_map(train_dataset['image'].numpy())
-    # print(fm_dpnet.shape)  
-
-    # print(fm_classifier.shape)
     kernel_matrices['DPNets'] = fm_dpnet @ fm_dpnet.T
     C_H['DPNets'] = np.max(kernel_matrices['DPNets'])
-    # if  max > C_H['DPNets']:
-    #     C_H['DPNets'] = max
-
     B_H['DPNets'] = np.min(kernel_matrices['DPNets'])
-    # if  min < B_H['DPNets']:
-    #     B_H['DPNets'] = min
 
     fm_classifier = oracle(train_dataset['image'].numpy())
     kernel_matrices['Classifier_Baseline'] = fm_classifier @ fm_classifier.T
     C_H['Classifier_Baseline'] = np.max(kernel_matrices['Classifier_Baseline'])
-    # if  max > C_H['Classifier_Baseline']:
-    #     C_H['Classifier_Baseline'] = max
-
     B_H['Classifier_Baseline'] = np.min(kernel_matrices['Classifier_Baseline'])
-    # if  min < B_H['Classifier_Baseline']:
-    #     B_H['Classifier_Baseline'] = min
 
-    # kernel_matrices['Linear'] = fm_linear @ fm_linear.T
-    # max = np.max(kernel_matrices['Linear'])
-    # if  max > C_H['Linear']:
-    #     C_H['Linear'] = max
 
     return transfer_operator_models, report, C_H, B_H, kernel_matrices

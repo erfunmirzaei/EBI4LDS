@@ -76,8 +76,7 @@ fn_j = {
                     'Classifier_Baseline':np.empty((n_0, configs.n_repits, configs.test_samples - 1)),
                     'DPNets':np.empty((n_0, configs.n_repits, configs.test_samples - 1))}
 
-# lower_bound = np.empty((n_0, configs.n_repits))
-
+# Run the simulation
 for i in tqdm(range(configs.n_repits)):
     # Load the dataset
     data_pipeline.main(configs, data_path, noisy_data_path) # Run data download and preprocessing
@@ -131,8 +130,7 @@ for i in tqdm(range(configs.n_repits)):
             fn_i[model_name][j][i] = report[model_name]['fn_i']
             fn_j[model_name][j][i] = report[model_name]['fn_j']        
 
-        # lower_bound[j][i] = 1 / tau
-
+# Save the results
 Path(main_path / "results").mkdir(parents=True, exist_ok=True)
 np.save(str(main_path) + f'/results/true_labels_eta_{configs.eta}.npy', true_labels)
 np.save(str(main_path) + f'/results/true_images_eta_{configs.eta}.npy', true_images)

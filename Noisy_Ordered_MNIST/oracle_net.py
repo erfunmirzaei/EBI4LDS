@@ -25,6 +25,7 @@ from utils import Metrics
 #  Define the oracle network
 # Setting up the architecture
 class CNNEncoder(nn.Module):
+    """ A simple CNN encoder for the Noisy Ordered MNIST dataset """
     def __init__(self, num_classes, configs):
         super(CNNEncoder, self).__init__()
         # Set the seed
@@ -75,6 +76,7 @@ class CNNEncoder(nn.Module):
 
 # Following kooplearn implementations, we define a Pytorch Lightning module and then wrap it in a TrainableFeatureMap
 class ClassifierModule(lightning.LightningModule):
+    """ A simple Pytorch Lightning module for the Noisy Ordered MNIST dataset """
     def __init__(self, num_classes: int, learning_rate: float, configs):
         super().__init__()
         self.num_classes = num_classes
@@ -120,6 +122,7 @@ class ClassifierModule(lightning.LightningModule):
         return {'val/accuracy': accuracy}
 
 class ClassifierFeatureMap(TrainableFeatureMap):
+    """ A simple TrainableFeatureMap for the Noisy Ordered MNIST dataset """
     def __init__(
                 self,
                 configs,
