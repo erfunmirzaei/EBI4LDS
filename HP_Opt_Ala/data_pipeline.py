@@ -2,9 +2,26 @@ import os
 import numpy as np
 from typing import Tuple
 from sklearn.preprocessing import robust_scale
-from io_typing import Trajectory
+from typing import NamedTuple
+
+class Trajectory(NamedTuple):
+    """
+    NamedTuple for the Ala2 dataset
+    """
+    ang: np.ndarray
+    dist: np.ndarray
+    pos: np.ndarray
 
 def ala2_dataset(data_path:os.PathLike, split='train'):
+    """
+    Load the Ala2 dataset
+    Args:
+        data_path: os.PathLike, path to the data
+        split: str, split of the dataset
+    Returns:
+        data: Trajectory, Ala2 dataset
+    """
+
     files = {
         "dihedrals": "alanine-dipeptide-3x250ns-backbone-dihedrals.npz",
         "distances": "alanine-dipeptide-3x250ns-heavy-atom-distances.npz",

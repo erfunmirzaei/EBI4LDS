@@ -1,22 +1,37 @@
 import os
 import json
 import pickle
-import importlib
 import numpy as np
 from tqdm import tqdm
-from einops import einsum
 from sklearn.model_selection import ParameterGrid
 from sklearn.gaussian_process.kernels import RBF
-from kooplearn.models import Linear, Nonlinear, Kernel
+from kooplearn.models import Kernel
 from kooplearn.data import traj_to_contexts
 from risk_bound import risk_bound_Ala
 
-from io_typing import Trajectory
-from io_data import ala2_dataset, lagged_sampler
+from data_pipeline import Trajectory, ala2_dataset, lagged_sampler
 
+
+def load_data(current_file_path:os.PathLike, split:str = 'train') -> Trajectory:
+    """
+    Load the Ala2 dataset
+    Args:
+        current_file_path: os.PathLike, path to the current file
+        split: str, split of the dataset
+    Returns:
+        data: Trajectory, Ala2 dataset
+    """
+    path = os.path.join(current_file_path, 'data/')
+    return ala2_dataset(path, split = split) 
 
 def hp_fit(configs:dict, current_file_path: os.PathLike):
-
+    """
+    Hyperparameter optimization for the Ala2 dataset
+    Args:
+        configs: dict, configurations for the experiment
+        current_file_path: os.PathLike, path to the current file
+    """
+    #Check if 'results' path exists
     results_path = os.path.join(current_file_path, 'results')
     if not os.path.exists(results_path):
         os.makedirs(results_path)
@@ -43,7 +58,6 @@ def hp_fit(configs:dict, current_file_path: os.PathLike):
     test_pos_data = traj_to_contexts(test_pos[:configs['data']['n_test']+lagtime*num_steps,:], context_window_len= num_steps +1, time_lag=lagtime)
 
     train_data.observables = {'pos': train_pos_data.data}
-
 
     estimator_args = configs['estimator']
 
@@ -92,10 +106,6 @@ def hp_fit(configs:dict, current_file_path: os.PathLike):
     #Pickling the results
     with open(os.path.join(results_path, 'results.pkl'), 'wb') as f:
         pickle.dump(result, f)
-
-def load_data(current_file_path:os.PathLike, split:str = 'train') -> Trajectory:
-    path = os.path.join(current_file_path, 'data/')
-    return ala2_dataset(path, split = split) 
 
 if __name__ == "__main__":
     current_file_path = os.path.dirname(__file__)

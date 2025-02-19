@@ -14,6 +14,14 @@ files = [
 ]
 
 def download(url, filename):
+    """
+    Download a file from a URL to a local path
+    Args:
+        url: str, URL to download from
+        filename: str, local path to save the file
+    Returns:
+        pathlib.Path, local path to the downloaded file
+    """
     #Adapted from https://stackoverflow.com/questions/37573483/progress-bar-while-download-file-over-http-with-requests
     r = requests.get(url, stream=True, allow_redirects=True)
     if r.status_code != 200:

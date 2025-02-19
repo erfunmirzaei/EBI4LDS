@@ -1,15 +1,17 @@
 import numpy as np
-from tqdm import tqdm
 from corr_est_cov_est import biased_covariance_estimator, unbiased_covariance_estimator
-from sklearn.gaussian_process.kernels import RBF
-from kooplearn.models import Linear, Nonlinear, Kernel
-from kooplearn.data import traj_to_contexts
 
 def risk_bound_Ala(kernel_model, n, r, delta):
     
     """
     Compute the risk bounds for different values of N
-
+    Args:
+        kernel_model: object, kernel model
+        n: int, number of data points
+        r: float, noise level
+        delta: float, confidence level
+    Returns:
+        risk_bound: float, risk bound
     """
     c_h = 1
     K = kernel_model.kernel_X / n
