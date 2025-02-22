@@ -25,6 +25,7 @@ def prime_factors(n):
     if n > 1:
         yield n
 
+
 def prod(iterable):
     """ 
     Return the product of the elements in the iterable 
@@ -108,7 +109,7 @@ def plot_OU_tau_length_scale(ax, Pinelis_bound, Pinelis_emp_bound_biased_cov_est
     #                 Pinelis_emp_bound_unbiased_cov_est_mean + Pinelis_emp_bound_unbiased_cov_est_std, alpha=0.2)
     
     
-    line4 = ax.loglog(taus, M_bound_mean, marker='^', label="our bound", linewidth=1)
+    line4 = ax.loglog(taus, M_bound_mean, marker='^', label="M bound", linewidth=1)
     ax.fill_between(taus, M_bound_mean - M_bound_std,
                     M_bound_mean + M_bound_std, alpha=0.2)
         
@@ -171,14 +172,15 @@ def plot_OU_tau(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pineli
 
     # Pass the proxy Line2D objects to the legend
     fig.legend(legend_lines, labels, loc='upper center', fontsize=10, ncol=len(length_scales), frameon=False)
+    # fig.legend(lines[:n_labels], labels, loc='upper center', fontsize=10, ncol=n_labels, frameon=False)
 
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 1, 0.85])
     plt.subplots_adjust(top=0.85)  # Add more space between title and legend
     plt.savefig(str(main_path) + f"/results/OU_Exp_tau_n_{configs.n_plot_tau}_delta_{configs.delta}.pdf", format="pdf", dpi=600)
 
-def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est,True_value, Ns, show_ylabel=False):
-    """ 
+def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est,True_value, Ns, length_scale, show_ylabel=False):
+    """
     Plot the bounds with respect to number of samples for a given length scale for optimal choice of tau 
     Args:
         ax: object, axis object
@@ -247,7 +249,7 @@ def plot_OU_N_length_scale(ax, Pinelis_bound, M_bound, M_emp_bound_biased_cov_es
     ax.set_xlabel("Number of training samples", fontsize=10)
     if show_ylabel:
         ax.set_ylabel("Covariance upper bound", fontsize=10)
-    # ax.set_title(f"length scale ={length_scale}", fontsize=10)
+    ax.set_title(f"length scale ={length_scale}", fontsize=10)
     ax.tick_params(axis='both', which='major', labelsize=10)
     ax.grid(True)
 
@@ -277,7 +279,9 @@ def plot_OU_N(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_
 
     # Plot each subplot and collect lines for the legend
     lines = []
-    lines += plot_OU_N_length_scale(axes, Pinelis_bound[0], M_bound[0], M_emp_bound_biased_cov_est[0], M_emp_bound_unbiased_cov_est[0],True_value[0], Ns, show_ylabel=show_ylabel)
+    for i, length_scale in enumerate(length_scales):
+        show_ylabel = (i == 0)  # Only show y-axis label on the first subplot
+        lines += plot_OU_N_length_scale(axes[i], Pinelis_bound[i], M_bound[i], M_emp_bound_biased_cov_est[i], M_emp_bound_unbiased_cov_est[i],True_value[i], Ns, length_scale, show_ylabel=show_ylabel)
 
     # Create a common legend
     n_labels = len(labels)
@@ -296,6 +300,7 @@ def plot_OU_N(configs, Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_
 
     # Pass the proxy Line2D objects to the legend
     fig.legend(legend_lines, labels, loc='upper center', fontsize=10, ncol=len(length_scales), frameon=False)
+    # fig.legend(lines[:n_labels], labels, loc='upper center', fontsize=10, ncol=n_labels, frameon=False)
 
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 1, 0.85])
