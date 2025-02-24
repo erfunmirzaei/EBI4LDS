@@ -20,7 +20,7 @@ def risk_bound_Ala(kernel_model, n, r, delta):
     V = kernel_model.V
     norm_est = np.trace(U.T @ K @ U @ V.T @ L @ V)
     for tau in range(1,n):
-        # TODO: This is for OU process only. You can change this to any other process
+        # TODO: This is for this process only. You can change this to any other process
         if (n / tau) % 2 == 0: 
             if delta/(2*norm_est) >= 2*(n/(2*tau) - 1)*(0.97**tau):
                 min_tau = tau
@@ -39,7 +39,6 @@ def risk_bound_Ala(kernel_model, n, r, delta):
     biased_cov_est = biased_covariance_estimator(kernel_matrix, tau)
     unbiased_cov_est = unbiased_covariance_estimator(kernel_matrix, tau)
 
-    # TODO: How do you choose lamda?? Excess risk bounds
     T_hat = kernel_model.kernel_YX
     biased_cross_cov_est = biased_covariance_estimator(T_hat, tau)
     unbiased_cross_cov_est = unbiased_covariance_estimator(T_hat, tau)
@@ -56,5 +55,5 @@ def risk_bound_Ala(kernel_model, n, r, delta):
     Fifth_term = np.sqrt(((2*L_tau + 1)*8*r*(norm_est**2)*tau*biased_cross_cov_est)/n)
     Sixth_term = np.sqrt((2*V_D*tau*l_tau)/n)
     risk_bound = First_term + Second_term + Third_term + Fourth_term + Fifth_term + Sixth_term 
-    
+
     return risk_bound

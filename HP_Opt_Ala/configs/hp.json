@@ -1,5 +1,7 @@
 {
     "n_jobs": 10,
+    "seed": 42,
+    "delta": 0.05,
     "data": {
         "n_train": 4000,
         "n_val": 5000,
@@ -12,6 +14,7 @@
     "estimator": {
         "name": "ReducedRank",
         "rank": 5,
+        "reduced_rank": true,
         "tikhonov_reg": 1e-6,
         "svd_solver": "arnoldi"
     },

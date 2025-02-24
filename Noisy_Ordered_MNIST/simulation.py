@@ -25,7 +25,6 @@ from transfer_op import fit_transfer_operator_models
 from oracle_net import ClassifierFeatureMap
 from normalized_corr_est_cov_est import normalized_biased_covariance_estimator, normalized_unbiased_covariance_estimator
 
-
 # Load configs
 main_path = Path(__file__).parent
 data_path = main_path / "__data__"
@@ -37,6 +36,8 @@ device = 'gpu' if torch.cuda.is_available() else 'cpu'
 random.seed(configs.rng_seed)
 np.random.seed(configs.rng_seed)
 torch.manual_seed(configs.rng_seed)
+torch.cuda.manual_seed_all(configs.rng_seed)
+
 Ns = np.arange(configs.n_train_first, int((1-configs.val_ratio) * configs.train_samples)+1, configs.n_train_step) # Ns = [500,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000]
 n_0 = len(Ns)
 
@@ -93,8 +94,8 @@ for i in tqdm(range(configs.n_repits)):
                     break
         tau = min_tau # tau = 25
 
-        oracle_train_dl = DataLoader(ordered_MNIST['train'].select(range(n)), batch_size=configs.oracle_batch_size, shuffle=True)
-        oracle_val_dl = DataLoader(ordered_MNIST['validation'].select(range(int(n*configs.val_ratio))), batch_size=len(ordered_MNIST['validation']), shuffle=True)
+        oracle_train_dl = DataLoader(ordered_MNIST['train'].select(range(n)), batch_size=configs.oracle_batch_size, shuffle=True, worker_init_fn=lambda worker_id: np.random.seed(configs.rng_seed))
+        oracle_val_dl = DataLoader(ordered_MNIST['validation'].select(range(int(n*configs.val_ratio))), batch_size=len(ordered_MNIST['validation']), shuffle=True, worker_init_fn=lambda worker_id: np.random.seed(configs.rng_seed))
 
         trainer_kwargs = {
             'accelerator': device,

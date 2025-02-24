@@ -16,9 +16,6 @@ from datasets import DatasetDict, interleave_datasets, load_dataset
 
 def make_indices(configs):
     """Make indices for the noisy dataset by adding noise to the indices"""
-    # set the seed
-    random.seed(configs.rng_seed)
-
     indices = {"train":[], "test":[]}
     for split in ["train", "test"]:
         ind = 0  # random.randint(0, 9)

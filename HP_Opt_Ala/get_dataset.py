@@ -39,9 +39,10 @@ def download(url, filename):
             shutil.copyfileobj(r_raw, f)
     return path
 
-if __name__ == '__main__':
-    example_path, _ = os.path.split(os.path.dirname(__file__))  
-    data_path = os.path.join(example_path, 'data/')
+def main(folder_path):
+
+    data_path = os.path.join(folder_path, 'data/')
+    print(data_path)
     if not os.path.exists(data_path):  
         os.makedirs(data_path)
     else:
@@ -50,3 +51,6 @@ if __name__ == '__main__':
         #Remove existing files
     for file in files:
         download(base_url + file, os.path.join(data_path, file))
+
+if __name__ == '__main__':
+    main()

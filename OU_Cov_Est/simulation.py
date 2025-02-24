@@ -15,7 +15,7 @@ import random
 import ml_confs
 import numpy as np
 from data_pipeline import make_dataset
-from cov_estimation import Covariance_Estimation_tau, Cov_Est_N
+from cov_estimation import Covariance_Estimation_tau, Cov_Est_N, Cov_Est_N2
 
 # Load configs
 main_path = Path(__file__).parent
@@ -44,18 +44,18 @@ for l in length_scales:
 
 # # Experiment 2: Plot the bounds for different values of N
 
-# # data_points = data_points.astype('float16')
+# data_points = data_points.astype('float16')
 
-# # Ns = np.arange(configs.n_train_first, configs.n_sample_est_tr, configs.n_train_step) 
-# Ns = [500,1000,2000, 5000, 10000, 20000,40000]
-# length_scales = [0.05, 0.15, 0.25]
+# Ns = np.arange(configs.n_train_first, configs.n_sample_est_tr, configs.n_train_step) 
+Ns = [500,1000,2000, 5000, 10000, 20000,40000]
+length_scales = [0.05, 0.15, 0.25]
 
-# for l in length_scales:
-#     Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_emp_bound_unbiased_cov_est, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est, True_value = Cov_Est_N2(data_points, Ns, configs.delta, l, configs)
-#     np.save(str(main_path) + f'/results/Pinelis_bound_delta_{configs.delta}_l_{l}.npy', Pinelis_bound)
-#     np.save(str(main_path) + f'/results/Pinelis_emp_bound_biased_cov_est_delta_{configs.delta}_l_{l}.npy', Pinelis_emp_bound_biased_cov_est)
-#     np.save(str(main_path) + f'/results/Pinelis_emp_bound_unbiased_cov_est_delta_{configs.delta}_l_{l}.npy', Pinelis_emp_bound_unbiased_cov_est)
-#     np.save(str(main_path) + f'/results/M_bound_delta_{configs.delta}_l_{l}.npy', M_bound)
-#     np.save(str(main_path) + f'/results/M_emp_bound_biased_cov_est_delta_{configs.delta}_l_{l}.npy', M_emp_bound_biased_cov_est)
-#     np.save(str(main_path) + f'/results/M_emp_bound_unbiased_cov_est_delta_{configs.delta}_l_{l}.npy', M_emp_bound_unbiased_cov_est)
-#     np.save(str(main_path) + f'/results/True_value_delta_{configs.delta}_l_{l}.npy', True_value)
+for l in length_scales:
+    Pinelis_bound, Pinelis_emp_bound_biased_cov_est, Pinelis_emp_bound_unbiased_cov_est, M_bound, M_emp_bound_biased_cov_est, M_emp_bound_unbiased_cov_est, True_value = Cov_Est_N2(data_points, Ns, configs.delta, l, configs)
+    np.save(str(main_path) + f'/results/Pinelis_bound_delta_{configs.delta}_l_{l}.npy', Pinelis_bound)
+    np.save(str(main_path) + f'/results/Pinelis_emp_bound_biased_cov_est_delta_{configs.delta}_l_{l}.npy', Pinelis_emp_bound_biased_cov_est)
+    np.save(str(main_path) + f'/results/Pinelis_emp_bound_unbiased_cov_est_delta_{configs.delta}_l_{l}.npy', Pinelis_emp_bound_unbiased_cov_est)
+    np.save(str(main_path) + f'/results/M_bound_delta_{configs.delta}_l_{l}.npy', M_bound)
+    np.save(str(main_path) + f'/results/M_emp_bound_biased_cov_est_delta_{configs.delta}_l_{l}.npy', M_emp_bound_biased_cov_est)
+    np.save(str(main_path) + f'/results/M_emp_bound_unbiased_cov_est_delta_{configs.delta}_l_{l}.npy', M_emp_bound_unbiased_cov_est)
+    np.save(str(main_path) + f'/results/True_value_delta_{configs.delta}_l_{l}.npy', True_value)

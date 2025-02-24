@@ -8,7 +8,7 @@ from sklearn.gaussian_process.kernels import RBF
 from kooplearn.models import Kernel
 from kooplearn.data import traj_to_contexts
 from risk_bound import risk_bound_Ala
-
+import get_dataset 
 from data_pipeline import Trajectory, ala2_dataset, lagged_sampler
 
 
@@ -31,6 +31,10 @@ def hp_fit(configs:dict, current_file_path: os.PathLike):
         configs: dict, configurations for the experiment
         current_file_path: os.PathLike, path to the current file
     """
+    # Set Seed
+    np.random.seed(configs['seed'])
+    # download the dataset
+    get_dataset.main(current_file_path)
     #Check if 'results' path exists
     results_path = os.path.join(current_file_path, 'results')
     if not os.path.exists(results_path):
@@ -73,13 +77,12 @@ def hp_fit(configs:dict, current_file_path: os.PathLike):
         )
     )
 
-
     val_scores = np.empty((len(params), 1))
     rmse = np.empty((len(params), num_steps))
     for iter_idx, iterate in tqdm(enumerate(params), total=len(params)):
         # try :
-        model = Kernel(RBF(length_scale= iterate['length_scale']), reduced_rank=True, rank = estimator_args['rank'], tikhonov_reg = iterate['tikhonov_reg']).fit(train_data)
-        risk_bound = risk_bound_Ala(model, n = train_data.shape[0], r = estimator_args['rank'], delta = 0.05)
+        model = Kernel(RBF(length_scale= iterate['length_scale']), reduced_rank=estimator_args['reduced_rank'], rank = estimator_args['rank'], tikhonov_reg = iterate['tikhonov_reg']).fit(train_data)
+        risk_bound = risk_bound_Ala(model, n = train_data.shape[0], r = estimator_args['rank'], delta = configs['delta'])
         val_scores[iter_idx] = risk_bound
         # except:
         #     val_scores[iter_idx] = np.inf

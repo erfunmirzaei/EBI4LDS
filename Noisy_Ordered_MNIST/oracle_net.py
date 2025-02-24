@@ -28,10 +28,6 @@ class CNNEncoder(nn.Module):
     """ A simple CNN encoder for the Noisy Ordered MNIST dataset """
     def __init__(self, num_classes, configs):
         super(CNNEncoder, self).__init__()
-        # Set the seed
-        random.seed(configs.rng_seed)
-        np.random.seed(configs.rng_seed)
-        torch.manual_seed(configs.rng_seed)
         self.conv1 = nn.Sequential(
             nn.Conv2d(
                 in_channels=configs.conv1_in_channels,
@@ -134,8 +130,7 @@ class ClassifierFeatureMap(TrainableFeatureMap):
         
         self.configs = configs
         #Set rng seed
-        lightning.seed_everything(seed)
-        self.seed = seed
+        lightning.seed_everything(configs.rng_seed)
         self.lightning_module = ClassifierModule(num_classes, learning_rate, configs)
 
         #Init trainer
