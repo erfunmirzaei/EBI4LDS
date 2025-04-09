@@ -25,5 +25,5 @@ def make_dataset(configs):
     Returns:
         data_points: np.array, shape (n, n_repits), samples from the OU process
     """
-    data_points = data_points = sample(configs.n_train_points + configs.n_val_points + configs.n_test_points, num_trajectories= configs.n_repits)
+    data_points = sample(configs.n_train_points + configs.n_val_points + configs.n_test_points, num_trajectories= configs.n_repits)
     return data_points
